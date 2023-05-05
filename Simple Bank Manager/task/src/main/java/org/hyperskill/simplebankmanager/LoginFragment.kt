@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +22,8 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
     class LoginFragment() : Fragment() {
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,8 +43,15 @@ private const val ARG_PARAM2 = "param2"
          loginButton.setOnClickListener {
              var inputName: String= view.findViewById<EditText>(R.id.loginUsername).text.toString()
              var inputPas: String = view.findViewById<EditText>(R.id.loginPassword).text.toString()
-             if (username == inputName && password == inputPas)
+             if (username == inputName && password == inputPas) {
+
                  Toast.makeText(view.context, "logged in", Toast.LENGTH_SHORT).show()
+
+                 val bundle = Bundle()
+                 bundle.putString("name", inputName)
+                 findNavController().navigate(R.id.action_loginFragment_to_userMenuFragment, bundle)
+
+             }
              else  Toast.makeText(view.context, "invalid credentials", Toast.LENGTH_SHORT).show()
          }
      }
