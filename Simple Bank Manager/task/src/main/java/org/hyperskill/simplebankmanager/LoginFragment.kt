@@ -10,17 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [LoginFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class LoginFragment() : Fragment() {
     private val accountService = IoC.AccountService
     override fun onCreateView(
@@ -54,8 +43,7 @@ class LoginFragment() : Fragment() {
         val username = intent.getStringExtra("username") ?: "Lara"
         val password = intent.getStringExtra("password") ?: "1234"
 
-
-        val exchangeMap = intent.getStringExtra("exchangeMap") ?: defaultMap
+        val exchangeMap = intent.getSerializableExtra("exchangeMap") ?: defaultMap
 
         CurrentUser.Name = username
         ExchangeMap.map = exchangeMap as Map<String, Map<String, Double>>

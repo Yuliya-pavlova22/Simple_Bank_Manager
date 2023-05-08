@@ -1968,8 +1968,8 @@ files:
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/27108#comment
-status: Failed
+status: Solved
 feedback:
-  message: View with id &quot;calculateExchangeToSpinner&quot; was not found
-  time: "Mon, 08 May 2023 12:45:17 UTC"
+  message: Congratulations!
+  time: "Mon, 08 May 2023 14:40:38 UTC"
 record: -1
