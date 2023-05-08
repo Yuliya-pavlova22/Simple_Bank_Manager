@@ -34,9 +34,31 @@ class LoginFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val defaultMap = mapOf(
+            "EUR" to mapOf(
+                "GBP" to 0.5,
+                "USD" to 2.0
+            ),
+            "GBP" to mapOf(
+                "EUR" to 2.0,
+                "USD" to 4.0
+            ),
+            "USD" to mapOf(
+                "EUR" to 0.5,
+                "GBP" to 0.25
+            )
+        )
+
+
         val intent = (view.context as AppCompatActivity).intent
         val username = intent.getStringExtra("username") ?: "Lara"
         val password = intent.getStringExtra("password") ?: "1234"
+
+
+        val exchangeMap = intent.getStringExtra("exchangeMap") ?: defaultMap
+
+        CurrentUser.Name = username
+        ExchangeMap.map = exchangeMap as Map<String, Map<String, Double>>
 
         var account = accountService.getById(1)
         account.balance = intent.getDoubleExtra("balance", 100.0)

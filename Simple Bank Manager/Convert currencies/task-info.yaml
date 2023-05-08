@@ -1632,6 +1632,344 @@ files:
 
 
   learner_created: false
+- name: src/main/java/org/hyperskill/simplebankmanager/CurrentUser.kt
+  visible: true
+  text: |-
+    package org.hyperskill.simplebankmanager
+
+    object CurrentUser {
+        lateinit var Name: String
+    }
+  learner_created: true
+- name: src/main/java/org/hyperskill/simplebankmanager/IoC.kt
+  visible: true
+  text: |-
+    package org.hyperskill.simplebankmanager
+
+    object IoC {
+        val AccountService: IAccountService = AccountService()
+    }
+  learner_created: true
+- name: src/main/java/org/hyperskill/simplebankmanager/UserMenuFragment.kt
+  visible: true
+  text: |-
+    package org.hyperskill.simplebankmanager
+
+    import android.os.Bundle
+    import androidx.fragment.app.Fragment
+    import android.view.LayoutInflater
+    import android.view.View
+    import android.view.ViewGroup
+    import android.widget.Button
+    import android.widget.TextView
+    import androidx.navigation.fragment.findNavController
+
+    class UserMenuFragment : Fragment() {
+        private var name: String? = null
+
+        override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            // Inflate the layout for this fragment
+            return inflater.inflate(R.layout.fragment_user_menu, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?){
+    //        name = arguments!!.getString("name","")
+            name = CurrentUser.Name
+            val showName = view?.findViewById<TextView>(R.id.userMenuWelcomeTextView)
+            showName!!.text = "Welcome $name"
+
+            var userMenuViewBalanceButton = view.findViewById<Button>(R.id.userMenuViewBalanceButton)
+            var userTransferFundsButton = view.findViewById<Button>(R.id.userMenuTransferFundsButton)
+
+            userMenuViewBalanceButton.setOnClickListener {
+                findNavController().navigate(R.id.action_userMenuFragment_to_viewBalanceFragment,arguments)
+            }
+
+            userTransferFundsButton.setOnClickListener {
+                findNavController().navigate(R.id.action_userMenuFragment_to_transferFundsFragment)
+            }
+        }
+    }
+  learner_created: true
+- name: src/main/res/layout/fragment_user_menu.xml
+  visible: true
+  learner_created: true
+- name: src/main/res/layout/fragment_view_balance.xml
+  visible: true
+  learner_created: true
+- name: src/main/res/layout/fragment_login.xml
+  visible: true
+  learner_created: true
+- name: src/main/java/org/hyperskill/simplebankmanager/ViewBalanceFragment.kt
+  visible: true
+  text: |
+    package org.hyperskill.simplebankmanager
+
+    import android.content.Context
+    import android.os.Bundle
+    import androidx.fragment.app.Fragment
+    import android.view.LayoutInflater
+    import android.view.View
+    import android.view.ViewGroup
+    import android.widget.TextView
+    import android.widget.Toast
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private const val ARG_PARAM1 = "param1"
+    private const val ARG_PARAM2 = "param2"
+
+    /**
+     * A simple [Fragment] subclass.
+     * Use the [ViewBalanceFragment.newInstance] factory method to
+     * create an instance of this fragment.
+     */
+    class ViewBalanceFragment : Fragment() {
+        override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            // Inflate the layout for this fragment
+            return inflater.inflate(R.layout.fragment_view_balance, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            var account: Account = IoC.AccountService.getById(1)
+
+            var viewBalanceAmountTextView = view.findViewById<TextView>(R.id.viewBalanceAmountTextView)
+            viewBalanceAmountTextView.text = account.toString()
+        }
+
+        override fun onResume() {
+            super.onResume()
+        }
+
+        override fun onAttach(context: Context) {
+            super.onAttach(context)
+        }
+    }
+  learner_created: true
+- name: src/main/java/org/hyperskill/simplebankmanager/AccountService.kt
+  visible: true
+  text: |-
+    package org.hyperskill.simplebankmanager
+
+    interface IAccountService{
+        fun getById(id: Int): Account
+    }
+
+    class Account (val id: Int) {
+        var balance: Double = 0.0
+
+        override fun toString(): String {
+            return "${String.format("%.2f", balance)}$"
+        }
+    }
+
+    class AccountService: IAccountService {
+        private val accounts: MutableMap<Int, Account> = mutableMapOf()
+
+        init {
+            accounts[1] = Account(1)
+        }
+
+        override fun getById(id: Int): Account {2
+            return accounts[id]!!
+        }
+    }
+  learner_created: true
+- name: src/main/java/org/hyperskill/simplebankmanager/LoginFragment.kt
+  visible: true
+  text: |-
+    package org.hyperskill.simplebankmanager
+
+    import android.os.Bundle
+    import android.view.LayoutInflater
+    import android.view.View
+    import android.view.ViewGroup
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.Toast
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.fragment.app.Fragment
+    import androidx.navigation.fragment.findNavController
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private const val ARG_PARAM1 = "param1"
+    private const val ARG_PARAM2 = "param2"
+
+    /**
+     * A simple [Fragment] subclass.
+     * Use the [LoginFragment.newInstance] factory method to
+     * create an instance of this fragment.
+     */
+    class LoginFragment() : Fragment() {
+        private val accountService = IoC.AccountService
+        override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            // Inflate the layout for this fragment
+            return inflater.inflate(R.layout.fragment_login, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+
+            val intent = (view.context as AppCompatActivity).intent
+            val username = intent.getStringExtra("username") ?: "Lara"
+            val password = intent.getStringExtra("password") ?: "1234"
+
+            CurrentUser.Name = username
+
+            var account = accountService.getById(1)
+            account.balance = intent.getDoubleExtra("balance", 100.0)
+
+            var loginButton: Button = view.findViewById(R.id.loginButton)
+            loginButton.setOnClickListener {
+                var inputName: String = view.findViewById<EditText>(R.id.loginUsername).text.toString()
+                var inputPas: String = view.findViewById<EditText>(R.id.loginPassword).text.toString()
+                if (username == inputName && password == inputPas) {
+
+                    Toast.makeText(view.context, "logged in", Toast.LENGTH_SHORT).show()
+
+                    val bundle = Bundle()
+                    bundle.putString("name", inputName)
+                    findNavController().navigate(R.id.action_loginFragment_to_userMenuFragment, bundle)
+
+                } else Toast.makeText(view.context, "invalid credentials", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+  learner_created: true
+- name: src/main/java/org/hyperskill/simplebankmanager/TransferFundsFragment.kt
+  visible: true
+  text: |
+    package org.hyperskill.simplebankmanager
+
+    import android.os.Bundle
+    import android.view.LayoutInflater
+    import android.view.View
+    import android.view.ViewGroup
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.Toast
+    import androidx.fragment.app.Fragment
+    import androidx.navigation.fragment.findNavController
+
+    class TransferFundsFragment : Fragment() {
+        override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            // Inflate the layout for this fragment
+            return inflater.inflate(R.layout.fragment_transfer_funds, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+
+            var transferFundsAccountEditText =
+                view.findViewById<EditText>(R.id.transferFundsAccountEditText)
+            var transferFundsAmountEditText =
+                view.findViewById<EditText>(R.id.transferFundsAmountEditText)
+
+            var transferFundsButton = view.findViewById<Button>(R.id.transferFundsButton)
+
+            var ctx = context
+            var nav = findNavController()
+            transferFundsButton.setOnClickListener {
+                if (checkAccaunt(transferFundsAccountEditText) &&
+                    checkAmount(transferFundsAmountEditText)
+                ) {
+                    var amount = transferFundsAmountEditText.text.toString().toDouble()
+                    var account: Account = IoC.AccountService.getById(1)
+
+                    if (amount > account.balance) {
+                        var toastTxt = "Not enough funds to transfer ${String.format("%.2f", amount)}$"
+                        Toast.makeText(context, toastTxt, Toast.LENGTH_SHORT).show()
+                    } else {
+                        account.balance -= amount
+                        var toastTxt =
+                            "Transferred ${String.format("%.2f", amount)}\$ to account ${transferFundsAccountEditText.text}"
+
+                        Toast.makeText(ctx, toastTxt, Toast.LENGTH_SHORT).show()
+
+                        nav.navigateUp()
+                    }
+                }
+            }
+        }
+
+        //проверка на корректный ввод аккаунта
+        fun checkAccaunt(transferFundsAccountEditText: EditText): Boolean {
+            var acTxt = transferFundsAccountEditText.text.toString()
+            var isAccountTrue = false
+
+            if (acTxt == "" || acTxt.length < 6) {
+                transferFundsAccountEditText.error = "Invalid account number"
+            } else {
+                if (acTxt.substring(0, 2) == "sa"
+                    || (acTxt.substring(0, 2) == "ca")
+                    && (isLettersOrDigits(acTxt.substring(2)))
+                ) {
+                    isAccountTrue = true
+
+                } else {
+                    // Toast.makeText(context, acTxt.substring(0, 2), Toast.LENGTH_SHORT).show()
+                    transferFundsAccountEditText.error = "Invalid account number"
+                }
+            }
+            return isAccountTrue
+        }
+
+        //проверка на коррекную сумму
+        fun checkAmount(transferFundsAmountEditText: EditText): Boolean {
+            var amountTxt = transferFundsAmountEditText.text.toString()
+            var amount: Double = 0.0
+            var isAmountTrue = false
+            try {
+                amount = amountTxt.toDouble()
+            } catch (e: Exception) {
+                transferFundsAmountEditText.error = "Invalid amount"
+            }
+            if (amount > 0) {
+                isAmountTrue = true
+            } else transferFundsAmountEditText.error = "Invalid amount"
+
+            return isAmountTrue
+        }
+
+        //проверка на числа
+        fun isLettersOrDigits(chars: String): Boolean {
+            return chars.filter { it in '0'..'9' }
+                .length == chars.length
+        }
+    }
+  learner_created: true
+- name: src/main/res/navigation/nav_graph.xml
+  visible: true
+  learner_created: true
+- name: src/main/res/layout/fragment_transfer_funds.xml
+  visible: true
+  learner_created: true
+- name: src/main/res/layout/fragment_calculate_exchange.xml
+  visible: true
+  learner_created: true
+- name: src/main/java/org/hyperskill/simplebankmanager/CalculateExchangeFragment.kt
+  visible: true
+  learner_created: true
+- name: src/main/java/org/hyperskill/simplebankmanager/ExchangeMap.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/27108#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: View with id &quot;calculateExchangeToSpinner&quot; was not found
+  time: "Mon, 08 May 2023 12:45:17 UTC"
 record: -1
